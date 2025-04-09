@@ -12,6 +12,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.ftp.api.assets.Time.getDateAndTime;
+
 @Service
 public class FtpService {
 
@@ -44,16 +46,16 @@ public class FtpService {
             FTPFile[] ftpFiles = ftpClient.listFiles(path);
             for (FTPFile ftpFile : ftpFiles) {
                 FileInfoDto fileInfo = new FileInfoDto();
+                String fullPath = "/" + Paths.get(path, ftpFile.getName()).toString().replace("\\", "/");
                 fileInfo.setName(ftpFile.getName());
-                fileInfo.setTimestamp(ftpFile.getTimestamp().getTimeInMillis());
-                fileInfo.setGroup(ftpFile.getGroup());
-                fileInfo.setLink(ftpFile.getLink());
-                fileInfo.setUser(ftpFile.getUser());
-                fileInfo.setType(ftpFile.getType());
+                fileInfo.setTimestamp(getDateAndTime(ftpFile.getTimestamp().getTimeInMillis()));
                 fileInfo.setFile(ftpFile.isFile());
                 fileInfo.setDirectory(ftpFile.isDirectory());
-                fileInfo.setFormattedString(ftpFile.toFormattedString());
+                fileInfo.setFullPath(fullPath);
 
+
+                //Esta seccion muestra los archivos que se encuentran en directorios dentro del directorio principal
+                //al que el usuario se encuentra
                 if (ftpFile.isDirectory()) {
                     String subPath = Paths.get(path, ftpFile.getName()).toString();
                     fileInfo.setChildren(listFtpTree(subPath));
@@ -135,16 +137,36 @@ public class FtpService {
         }
     }
 
-    // Eliminar directorio en el servidor FTP
+    // Eliminar directorio en el servidor FTP, incluyendo su contenido recursivamente
     public boolean deleteDirectory(String path) throws IOException {
         FTPClient ftpClient = loginFtp();
-
         try {
-            return ftpClient.removeDirectory(path);
+            return deleteDirectoryRecursive(ftpClient, path);
         } finally {
             logoutFtp(ftpClient);
         }
     }
+
+    // Función auxiliar recursiva para eliminar todos los archivos y subdirectorios
+    private boolean deleteDirectoryRecursive(FTPClient ftpClient, String path) throws IOException {
+        FTPFile[] files = ftpClient.listFiles(path);
+
+        for (FTPFile file : files) {
+            String fullPath = path + "/" + file.getName();
+            if (file.isDirectory()) {
+                // Evitar borrar "." y ".."
+                if (!file.getName().equals(".") && !file.getName().equals("..")) {
+                    deleteDirectoryRecursive(ftpClient, fullPath);
+                }
+            } else {
+                ftpClient.deleteFile(fullPath);
+            }
+        }
+
+        // Finalmente eliminar el directorio vacío
+        return ftpClient.removeDirectory(path);
+    }
+
 
     // Cierra la conexión FTP de forma segura
     private void logoutFtp(FTPClient ftpClient) throws IOException {

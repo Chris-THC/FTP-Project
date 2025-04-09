@@ -75,7 +75,7 @@ public class FtpController {
         }
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/file")
     public ResponseEntity<String> deleteFile(@RequestBody DeleteFileRequestForm request) {
         try {
             boolean success = ftpService.deleteFile(request.getPath());
@@ -84,6 +84,18 @@ public class FtpController {
                     : ResponseEntity.status(400).body("No se pudo eliminar el archivo");
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Error al eliminar el archivo");
+        }
+    }
+
+    @DeleteMapping("/delete/directory")
+    public ResponseEntity<String> deleteDirectory(@RequestBody DeleteFileRequestForm request) {
+        try {
+            boolean success = ftpService.deleteDirectory(request.getPath());
+            return success
+                    ? ResponseEntity.ok("Carpeta borrada exitosamente")
+                    : ResponseEntity.status(400).body("No se pudo eliminar la carpeta");
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Error al eliminar la carpeta");
         }
     }
 

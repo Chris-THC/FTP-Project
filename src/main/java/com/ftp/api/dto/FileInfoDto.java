@@ -13,14 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 public class FileInfoDto {
     private String name;
-    private long timestamp;
-    private String group;
-    private String link;
-    private String user;
-    private int type;
+    private String fullPath;
+    private String timestamp;
     private boolean isFile;
     private boolean isDirectory;
-    private String formattedString;
     @Builder.Default
     private List<FileInfoDto> children = new ArrayList<>();
 }
