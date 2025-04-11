@@ -12,7 +12,7 @@ public class Time {
 
             // Formateador para mostrar la fecha y hora en formato de 12 horas (AM/PM)
             SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy, hh:mm:ss a");
-            sdf.setTimeZone(TimeZone.getTimeZone("UTC")); // Opcional: ajustar zona horaria
+            sdf.setTimeZone(TimeZone.getTimeZone("America/Mexico_City")); // Opcional: ajustar zona horaria
 
             // Retornar la fecha formateada
             return sdf.format(date);
