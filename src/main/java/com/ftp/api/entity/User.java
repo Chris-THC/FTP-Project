@@ -1,33 +1,29 @@
 package com.ftp.api.entity;
 
-
+import com.ftp.api.convertors.RoleConvertor;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "user")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "User")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idUser")
     private Integer idUser;
 
-    @Column(length = 100, nullable = false)
+    @Column(name = "numControl", nullable = false, length = 100)
     private String numControl;
 
-    @Column(length = 255, nullable = false)
-    private String password;
+    @Column(name = "userPassword", nullable = false, length = 255)
+    private String userPassword;
 
-    @OneToOne
-    @JoinColumn(name = "idPerInfo", referencedColumnName = "idPerInfo")
-    private PersonalInfo personalInfo;
-
-    @ManyToOne
-    @JoinColumn(name = "idRol", referencedColumnName = "idRol")
-    private Rol rol;
+    @Column(name = "userRole", nullable = false)
+    @Convert(converter = RoleConvertor.class)
+    private Role userRole;
 }

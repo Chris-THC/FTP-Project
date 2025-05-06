@@ -6,25 +6,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "personalinfo")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "PersonalInfo")
 public class PersonalInfo {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idPerInfo")
     private Integer idPerInfo;
 
-    @Column(length = 100, nullable = false)
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(length = 100, nullable = false)
+    @Column(name = "lastName", nullable = false, length = 100)
     private String lastName;
 
-    @Column(length = 100, nullable = false)
+    @Column(name = "maternalLastName", length = 100)
     private String maternalLastName;
 
-    @Column(length = 500)
+    @Column(name = "personalPath", length = 500)
     private String personalPath;
 }
