@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Getter
 @RequiredArgsConstructor
 public enum Role {
-    Admin(0), Professor(1), Student(1);
+    Admin(0), Professor(1), Student(2);
     private final int key;
 
     public static Role getRole(Integer key) {

@@ -10,7 +10,7 @@ public class RoleConvertor implements AttributeConverter<Role, Integer> {
     @Override
     public Integer convertToDatabaseColumn(Role role) {
         if (role == null) {
-            return null;
+            throw new IllegalArgumentException("Role cannot be null");
         }
         return role.getKey();
     }
@@ -18,7 +18,7 @@ public class RoleConvertor implements AttributeConverter<Role, Integer> {
     @Override
     public Role convertToEntityAttribute(Integer key) {
         if (key == null) {
-            return null;
+            throw new IllegalArgumentException("Key cannot be null");
         }
         return Role.getRole(key);
     }

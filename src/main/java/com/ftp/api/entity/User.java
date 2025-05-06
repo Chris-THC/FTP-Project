@@ -10,20 +10,20 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "User")
+@Table(name = "user")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idUser")
+    @Column(name = "id_user")
     private Integer idUser;
 
-    @Column(name = "numControl", nullable = false, length = 100)
+    @Column(name = "num_control", nullable = false, length = 100)
     private String numControl;
 
-    @Column(name = "userPassword", nullable = false, length = 255)
+    @Column(name = "user_password", nullable = false, length = 255)
     private String userPassword;
 
-    @Column(name = "userRole", nullable = false)
+    @Column(name = "user_role", nullable = false)
     @Convert(converter = RoleConvertor.class)
     private Role userRole;
 }
