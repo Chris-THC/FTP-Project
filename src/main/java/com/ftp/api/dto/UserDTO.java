@@ -18,11 +18,15 @@ public class UserDTO {
     @ApiObjectField(name = "userRole", description = "User's role")
     private Role userRole;
 
+    @ApiObjectField(name = "idPersonalInfo", description = "User's personal info ID")
+    private Integer idPersonalInfo;
+
     public static UserDTO build(final User user) {
         return UserDTO.builder()
                 .idUser(user.getIdUser())
                 .numControl(user.getNumControl())
                 .userRole(user.getUserRole())
+                .idPersonalInfo(user.getIdPerInfo())
                 .build();
     }
 }
