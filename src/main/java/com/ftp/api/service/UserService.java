@@ -21,23 +21,25 @@ public class UserService {
     @Value("${not.found}")
     private String notFound;
 
+    private void validateIfUserExists(final int idUser) throws Exception {
+        if (!userRepository.existsById(idUser)) {
+            throw new Exception(notFound);
+        }
+    }
+
     public UserDTO createUser(final UserForm form) {
         User user = User.builder()
                 .numControl(form.getControlNumber())
                 .userPassword(form.getPassword())
                 //.password(passwordEncoder.encode(form.getPassword())) // Descomentar hasta gregar la encriptacion de la contraseña
                 .userRole(form.getUserRole())
+                .idPersonalInfo(form.getIdPersonalInfo())
                 .build();
 
         userRepository.save(user);
         return UserDTO.build(user);
     }
 
-    private void validateIfUserExists(final int idUser) throws Exception {
-        if (!userRepository.existsById(idUser)) {
-            throw new Exception(notFound);
-        }
-    }
 
     public List<UserDTO> getAllUsers() {
         final List<User> getAll = userRepository.findAll();

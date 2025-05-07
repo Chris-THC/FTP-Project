@@ -26,7 +26,7 @@ public class UserDTO {
                 .idUser(user.getIdUser())
                 .numControl(user.getNumControl())
                 .userRole(user.getUserRole())
-                .idPersonalInfo(user.getIdPerInfo())
+                .idPersonalInfo(user.getIdPersonalInfo())
                 .build();
     }
 }

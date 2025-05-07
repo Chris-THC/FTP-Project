@@ -10,8 +10,8 @@ import java.io.Serializable;
 @Data
 public class UserForm implements Serializable {
 
-    @ApiObjectField(name = "control number", description = "Users's control number")
-    @Size(max = 20, message = "{name.right.length}")
+    @ApiObjectField(name = "controlNumber", description = "Users's control number")
+    @Size(max = 20, message = "{controlNumber.right.length}")
     private String controlNumber;
 
     @ApiObjectField(name = "password", description = "User's password")
