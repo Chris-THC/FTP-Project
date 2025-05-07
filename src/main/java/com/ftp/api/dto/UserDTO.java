@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import org.jsondoc.core.annotation.ApiObjectField;
 
+import java.util.List;
+
 @Builder
 @Getter
 public class UserDTO {
@@ -20,6 +22,19 @@ public class UserDTO {
 
     @ApiObjectField(name = "idPersonalInfo", description = "User's personal info ID")
     private Integer idPersonalInfo;
+
+    @ApiObjectField(name = "personalInfo", description = "List of personal info details")
+    private List<PersonalInfoDTO> personalInfo;
+
+    public static UserDTO build(final User user, final List<PersonalInfoDTO> personalInfo) {
+        return UserDTO.builder()
+                .idUser(user.getIdUser())
+                .numControl(user.getNumControl())
+                .userRole(user.getUserRole())
+                .idPersonalInfo(user.getIdPersonalInfo())
+                .personalInfo(personalInfo)
+                .build();
+    }
 
     public static UserDTO build(final User user) {
         return UserDTO.builder()

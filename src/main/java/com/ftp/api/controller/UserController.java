@@ -48,4 +48,10 @@ public class UserController {
         final UserDTO updateUserInfo = userService.updateUser(form, userId);
         return ResponseEntity.ok().body(updateUserInfo);
     }
+
+    @GetMapping(path = "/information")
+    public ResponseEntity<List<UserDTO>> getUsersWithPersonalInfo() {
+        List<UserDTO> usersWithPersonalInfo = userService.getUsersWithPersonalInfo();
+        return ResponseEntity.ok().body(usersWithPersonalInfo);
+    }
 }
