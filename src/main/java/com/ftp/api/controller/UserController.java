@@ -1,6 +1,7 @@
 package com.ftp.api.controller;
 
 import com.ftp.api.dto.UserDTO;
+import com.ftp.api.form.PersonalInfoForm;
 import com.ftp.api.form.UserForm;
 import com.ftp.api.service.UserService;
 import jakarta.validation.Valid;
@@ -53,5 +54,21 @@ public class UserController {
     public ResponseEntity<List<UserDTO>> getUsersWithPersonalInfo() {
         List<UserDTO> usersWithPersonalInfo = userService.getUsersWithPersonalInfo();
         return ResponseEntity.ok().body(usersWithPersonalInfo);
+    }
+
+    @GetMapping(path = "/information/{userId}")
+    public ResponseEntity<UserDTO> getUserWithPersonalInfoById(@PathVariable("userId") int userId) throws Exception {
+        UserDTO userWithPersonalInfo = userService.getUserWithPersonalInfoById(userId);
+        return ResponseEntity.ok().body(userWithPersonalInfo);
+    }
+
+    @PostMapping(path = "/information/fullname")
+    public ResponseEntity<UserDTO> getUserWithPersonalInfoByFullName(@RequestBody PersonalInfoForm personalInfoForm) throws Exception {
+        UserDTO userWithPersonalInfo = userService.getUserWithPersonalInfoByFullName(
+                personalInfoForm.getName(),
+                personalInfoForm.getLastName(),
+                personalInfoForm.getMaternalLastName()
+        );
+        return ResponseEntity.ok().body(userWithPersonalInfo);
     }
 }

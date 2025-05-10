@@ -24,5 +24,4 @@ public class PersonalInfoForm implements Serializable {
     @ApiObjectField(name = "personalPath", description = "Users's personal path")
     @Size(max = 300, message = "{personalPath.right.length}")
     private String personalPath;
-
 }

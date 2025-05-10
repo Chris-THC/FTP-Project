@@ -2,6 +2,7 @@ package com.ftp.api.service;
 
 import com.ftp.api.dto.PersonalInfoDTO;
 import com.ftp.api.dto.UserDTO;
+import com.ftp.api.entity.PersonalInfo;
 import com.ftp.api.entity.User;
 import com.ftp.api.form.UserForm;
 import com.ftp.api.repositori.PersonalInfoRepository;
@@ -80,23 +81,59 @@ public class UserService {
         return UserDTO.build(userUpdate);
     }
 
-//    Inner join
-public List<UserDTO> getUsersWithPersonalInfo() {
-    return userRepository.findAll().stream().map(user -> {
-        // Obtén la lista de PersonalInfoDTO
+    public List<UserDTO> getUsersWithPersonalInfo() {
+        return userRepository.findAll().stream().map(user -> {
+            List<PersonalInfoDTO> personalInfoList = personalInfoRepository.findById(user.getIdPersonalInfo())
+                    .stream()
+                    .map(PersonalInfoDTO::build)
+                    .toList();
+
+            return UserDTO.builder()
+                    .idUser(user.getIdUser())
+                    .numControl(user.getNumControl())
+                    .userRole(user.getUserRole())
+                    .idPersonalInfo(user.getIdPersonalInfo())
+                    .personalInfo(personalInfoList)
+                    .build();
+        }).toList();
+    }
+
+    public UserDTO getUserWithPersonalInfoById(int userId) throws Exception {
+        validateIfUserExists(userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new Exception(notFound));
         List<PersonalInfoDTO> personalInfoList = personalInfoRepository.findById(user.getIdPersonalInfo())
                 .stream()
                 .map(PersonalInfoDTO::build)
                 .toList();
 
-        // Construye el UserDTO con la lista de PersonalInfoDTO
         return UserDTO.builder()
                 .idUser(user.getIdUser())
                 .numControl(user.getNumControl())
                 .userRole(user.getUserRole())
                 .idPersonalInfo(user.getIdPersonalInfo())
-                .personalInfo(personalInfoList) // Aquí se pasa la lista correcta
+                .personalInfo(personalInfoList)
                 .build();
-    }).toList();
-}
+    }
+
+    public UserDTO getUserWithPersonalInfoByFullName(String name, String lastName, String maternalLastName) throws Exception {
+        // Busca la información personal por nombre completo
+        PersonalInfo personalInfo = personalInfoRepository.findByNameAndLastNameAndMaternalLastName(name, lastName, maternalLastName)
+                .orElseThrow(() -> new Exception(notFound));
+
+        // Busca el usuario relacionado con la información personal
+        User user = userRepository.findByIdPersonalInfo(personalInfo.getIdPerInfo())
+                .orElseThrow(() -> new Exception(notFound));
+
+        // Construye la lista de PersonalInfoDTO
+        List<PersonalInfoDTO> personalInfoList = List.of(PersonalInfoDTO.build(personalInfo));
+
+        // Construye y retorna el UserDTO
+        return UserDTO.builder()
+                .idUser(user.getIdUser())
+                .numControl(user.getNumControl())
+                .userRole(user.getUserRole())
+                .idPersonalInfo(user.getIdPersonalInfo())
+                .personalInfo(personalInfoList)
+                .build();
+    }
 }
