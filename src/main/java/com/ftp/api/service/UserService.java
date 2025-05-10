@@ -4,6 +4,10 @@ import com.ftp.api.dto.PersonalInfoDTO;
 import com.ftp.api.dto.UserDTO;
 import com.ftp.api.entity.PersonalInfo;
 import com.ftp.api.entity.User;
+import com.ftp.api.exceptions.UserException.UserCreationException;
+import com.ftp.api.exceptions.UserException.UserDeletionException;
+import com.ftp.api.exceptions.UserException.UserNotFoundException;
+import com.ftp.api.exceptions.UserException.UserUpdateException;
 import com.ftp.api.form.UserForm;
 import com.ftp.api.repositori.PersonalInfoRepository;
 import com.ftp.api.repositori.UserRepository;
@@ -25,25 +29,27 @@ public class UserService {
     @Value("${not.found}")
     private String notFound;
 
-    private void validateIfUserExists(final int idUser) throws Exception {
+    private void validateIfUserExists(final int idUser) {
         if (!userRepository.existsById(idUser)) {
-            throw new Exception(notFound);
+            throw new UserNotFoundException(notFound);
         }
     }
 
     public UserDTO createUser(final UserForm form) {
-        User user = User.builder()
-                .numControl(form.getControlNumber())
-                .userPassword(form.getPassword())
-                //.password(passwordEncoder.encode(form.getPassword())) // Descomentar hasta gregar la encriptacion de la contraseña
-                .userRole(form.getUserRole())
-                .idPersonalInfo(form.getIdPersonalInfo())
-                .build();
+        try {
+            User user = User.builder()
+                    .numControl(form.getControlNumber())
+                    .userPassword(form.getPassword())
+                    .userRole(form.getUserRole())
+                    .idPersonalInfo(form.getIdPersonalInfo())
+                    .build();
 
-        userRepository.save(user);
-        return UserDTO.build(user);
+            userRepository.save(user);
+            return UserDTO.build(user);
+        } catch (Exception e) {
+            throw new UserCreationException("Error al crear el usuario: " + e.getMessage());
+        }
     }
-
 
     public List<UserDTO> getAllUsers() {
         final List<User> getAll = userRepository.findAll();
@@ -54,31 +60,38 @@ public class UserService {
                 .toList();
     }
 
-    public UserDTO getUserById(final int idUser) throws Exception {
+    public UserDTO getUserById(final int idUser) {
         validateIfUserExists(idUser);
-        final User user = userRepository.findById(idUser).get();
+        final User user = userRepository.findById(idUser).orElseThrow(() -> new UserNotFoundException(notFound));
         return UserDTO.build(user);
     }
 
-    public void deleteUser(final int idUser) throws Exception {
+    public void deleteUser(final int idUser) {
         validateIfUserExists(idUser);
-        userRepository.deleteById(idUser);
+        try {
+            userRepository.deleteById(idUser);
+        } catch (Exception e) {
+            throw new UserDeletionException("Error al eliminar el usuario con ID " + idUser + ": " + e.getMessage());
+        }
     }
 
-    public UserDTO updateUser(final UserForm form, final int idUser) throws Exception {
+    public UserDTO updateUser(final UserForm form, final int idUser) {
         validateIfUserExists(idUser);
-        final User userUpdate = userRepository.findById(idUser).get();
+        try {
+            final User userUpdate = userRepository.findById(idUser).orElseThrow(() -> new UserNotFoundException(notFound));
 
-        User userInfo = User.builder()
-                .numControl(form.getControlNumber())
-                .userPassword(form.getPassword())
-                //.password(passwordEncoder.encode(form.getPassword())) // Descomentar hasta gregar la encriptacion de la contraseña
-                .userRole(form.getUserRole())
-                .build();
+            User userInfo = User.builder()
+                    .numControl(form.getControlNumber())
+                    .userPassword(form.getPassword())
+                    .userRole(form.getUserRole())
+                    .build();
 
-        userUpdate.updateUser(userInfo);
-        userRepository.save(userUpdate);
-        return UserDTO.build(userUpdate);
+            userUpdate.updateUser(userInfo);
+            userRepository.save(userUpdate);
+            return UserDTO.build(userUpdate);
+        } catch (Exception e) {
+            throw new UserUpdateException("Error al actualizar el usuario con ID " + idUser + ": " + e.getMessage());
+        }
     }
 
     public List<UserDTO> getUsersWithPersonalInfo() {
@@ -98,9 +111,9 @@ public class UserService {
         }).toList();
     }
 
-    public UserDTO getUserWithPersonalInfoById(int userId) throws Exception {
+    public UserDTO getUserWithPersonalInfoById(int userId) {
         validateIfUserExists(userId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new Exception(notFound));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(notFound));
         List<PersonalInfoDTO> personalInfoList = personalInfoRepository.findById(user.getIdPersonalInfo())
                 .stream()
                 .map(PersonalInfoDTO::build)
@@ -115,12 +128,12 @@ public class UserService {
                 .build();
     }
 
-    public UserDTO getUserWithPersonalInfoByFullName(String name, String lastName, String maternalLastName) throws Exception {
+    public UserDTO getUserWithPersonalInfoByFullName(String name, String lastName, String maternalLastName) {
         PersonalInfo personalInfo = personalInfoRepository.findByNameAndLastNameAndMaternalLastName(name, lastName, maternalLastName)
-                .orElseThrow(() -> new Exception(notFound));
+                .orElseThrow(() -> new UserNotFoundException(notFound));
 
         User user = userRepository.findByIdPersonalInfo(personalInfo.getIdPerInfo())
-                .orElseThrow(() -> new Exception(notFound));
+                .orElseThrow(() -> new UserNotFoundException(notFound));
 
         List<PersonalInfoDTO> personalInfoList = List.of(PersonalInfoDTO.build(personalInfo));
 
@@ -133,9 +146,9 @@ public class UserService {
                 .build();
     }
 
-    public UserDTO getUserByNumControl(String numControl) throws Exception {
+    public UserDTO getUserByNumControl(String numControl) {
         User user = userRepository.findByNumControl(numControl)
-                .orElseThrow(() -> new Exception(notFound));
+                .orElseThrow(() -> new UserNotFoundException(notFound));
 
         List<PersonalInfoDTO> personalInfoList = personalInfoRepository.findById(user.getIdPersonalInfo())
                 .stream()
