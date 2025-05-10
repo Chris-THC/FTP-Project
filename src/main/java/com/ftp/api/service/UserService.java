@@ -116,18 +116,32 @@ public class UserService {
     }
 
     public UserDTO getUserWithPersonalInfoByFullName(String name, String lastName, String maternalLastName) throws Exception {
-        // Busca la información personal por nombre completo
         PersonalInfo personalInfo = personalInfoRepository.findByNameAndLastNameAndMaternalLastName(name, lastName, maternalLastName)
                 .orElseThrow(() -> new Exception(notFound));
 
-        // Busca el usuario relacionado con la información personal
         User user = userRepository.findByIdPersonalInfo(personalInfo.getIdPerInfo())
                 .orElseThrow(() -> new Exception(notFound));
 
-        // Construye la lista de PersonalInfoDTO
         List<PersonalInfoDTO> personalInfoList = List.of(PersonalInfoDTO.build(personalInfo));
 
-        // Construye y retorna el UserDTO
+        return UserDTO.builder()
+                .idUser(user.getIdUser())
+                .numControl(user.getNumControl())
+                .userRole(user.getUserRole())
+                .idPersonalInfo(user.getIdPersonalInfo())
+                .personalInfo(personalInfoList)
+                .build();
+    }
+
+    public UserDTO getUserByNumControl(String numControl) throws Exception {
+        User user = userRepository.findByNumControl(numControl)
+                .orElseThrow(() -> new Exception(notFound));
+
+        List<PersonalInfoDTO> personalInfoList = personalInfoRepository.findById(user.getIdPersonalInfo())
+                .stream()
+                .map(PersonalInfoDTO::build)
+                .toList();
+
         return UserDTO.builder()
                 .idUser(user.getIdUser())
                 .numControl(user.getNumControl())

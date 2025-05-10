@@ -71,4 +71,10 @@ public class UserController {
         );
         return ResponseEntity.ok().body(userWithPersonalInfo);
     }
+
+    @GetMapping(path = "/control/number/{numControl}")
+    public ResponseEntity<UserDTO> getUserByNumControl(@PathVariable("numControl") String numControl) throws Exception {
+        UserDTO userDTO = userService.getUserByNumControl(numControl);
+        return ResponseEntity.ok().body(userDTO);
+    }
 }
