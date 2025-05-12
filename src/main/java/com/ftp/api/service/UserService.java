@@ -14,6 +14,7 @@ import com.ftp.api.repositori.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -25,6 +26,7 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final PersonalInfoRepository personalInfoRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${not.found}")
     private String notFound;
@@ -39,7 +41,7 @@ public class UserService {
         try {
             User user = User.builder()
                     .numControl(form.getControlNumber())
-                    .userPassword(form.getPassword())
+                    .userPassword(passwordEncoder.encode(form.getPassword()))
                     .userRole(form.getUserRole())
                     .idPersonalInfo(form.getIdPersonalInfo())
                     .build();
@@ -82,7 +84,7 @@ public class UserService {
 
             User userInfo = User.builder()
                     .numControl(form.getControlNumber())
-                    .userPassword(form.getPassword())
+                    .userPassword(passwordEncoder.encode(form.getPassword()))
                     .userRole(form.getUserRole())
                     .build();
 
