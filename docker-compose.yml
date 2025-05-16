@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ftp_project_app
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db
+    restart: always
+    environment:
+      SERVER_PORT: 8081
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/ftp_project
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1234
+
+      FTP_HOST: 192.168.0.200
+      FTP_PORT: 21
+      FTP_USER: admin
+      FTP_PASSWORD: Chinito1
+
+      SPRING_FLYWAY_URL: jdbc:mysql://db:3306/ftp_project
+      SPRING_FLYWAY_USER: root
+      SPRING_FLYWAY_PASSWORD: 1234
+
+  db:
+    image: mysql:8.0.33
+    container_name: ftp_project_db
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: ftp_project
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
