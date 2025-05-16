@@ -1,6 +1,8 @@
 package com.ftp.api.service;
 
+import com.ftp.api.config.FtpConfig;
 import com.ftp.api.dto.FileInfoDto;
+import lombok.AllArgsConstructor;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.springframework.stereotype.Service;
@@ -15,18 +17,15 @@ import java.util.List;
 import static com.ftp.api.assets.Time.getDateAndTime;
 
 @Service
+@AllArgsConstructor
 public class FtpService {
-
-    private String host = "localhost";
-    private int port = 21;
-    private String user = "usuario1";
-    private String pass = "1234";
+    private final FtpConfig ftpConfig;
 
     // Función para conectar y autenticar al servidor FTP
     private FTPClient loginFtp() throws IOException {
         FTPClient ftpClient = new FTPClient();
-        ftpClient.connect(host, port);
-        boolean loginSuccess = ftpClient.login(user, pass);
+        ftpClient.connect(ftpConfig.getHost(), ftpConfig.getPort());
+        boolean loginSuccess = ftpClient.login(ftpConfig.getUser(), ftpConfig.getPassword());
 
         if (!loginSuccess) {
             ftpClient.disconnect();
@@ -46,7 +45,7 @@ public class FtpService {
             FTPFile[] ftpFiles = ftpClient.listFiles(path);
             for (FTPFile ftpFile : ftpFiles) {
                 FileInfoDto fileInfo = new FileInfoDto();
-                String fullPath = "/" + Paths.get(path, ftpFile.getName()).toString().replace("\\", "/");
+                String fullPath = Paths.get(path, ftpFile.getName()).toString().replace("\\", "/");
                 fileInfo.setName(ftpFile.getName());
                 fileInfo.setTimestamp(getDateAndTime(ftpFile.getTimestamp().getTimeInMillis()));
                 fileInfo.setFile(ftpFile.isFile());
@@ -166,7 +165,6 @@ public class FtpService {
         // Finalmente eliminar el directorio vacío
         return ftpClient.removeDirectory(path);
     }
-
 
     // Cierra la conexión FTP de forma segura
     private void logoutFtp(FTPClient ftpClient) throws IOException {
