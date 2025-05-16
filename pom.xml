@@ -113,6 +113,13 @@
             <version>3.28.0-GA</version>
         </dependency>
 
+        <!-- Add flyway-core -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>9.22.3</version>
+        </dependency>
+
     </dependencies>
 
     <build>
