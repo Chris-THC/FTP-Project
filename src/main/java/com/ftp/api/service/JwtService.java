@@ -26,6 +26,7 @@ public class JwtService {
     }
 
     private String getToken(Map<String, Object> extraClaims, UserDetails user) {
+
         String jwts = Jwts
                 .builder()
                 .setClaims(extraClaims)
@@ -33,6 +34,7 @@ public class JwtService {
                 .claim("idUser", userService.getUserByNumControl(user.getUsername()).getIdUser())
                 .claim("idPersonalInfo", userService.getUserByNumControl(user.getUsername()).getIdPersonalInfo())
                 .claim("role", userService.getUserByNumControl(user.getUsername()).getUserRole())
+                .claim("personalPath", userService.getUserByNumControl(user.getUsername()).getPersonalInfo().get(0).getPersonalPath())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 10)))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
