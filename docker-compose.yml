@@ -22,6 +22,7 @@ services:
       FTP_USER: admin
       FTP_PASSWORD: Chinito1
 
+
       SPRING_FLYWAY_URL: jdbc:mysql://db:3306/ftp_project
       SPRING_FLYWAY_USER: root
       SPRING_FLYWAY_PASSWORD: 1234
