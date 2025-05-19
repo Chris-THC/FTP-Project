@@ -17,10 +17,11 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 1234
 
-      FTP_HOST: 192.168.1.71
-      FTP_PORT: 21
-      FTP_USER: usuario1
-      FTP_PASSWORD: 1234
+      FTP_HOST: 192.168.0.200
+      FTP_PORT: 22
+      FTP_USER: admin
+      FTP_PASSWORD: Chinito1
+
 
       SPRING_FLYWAY_URL: jdbc:mysql://db:3306/ftp_project
       SPRING_FLYWAY_USER: root
