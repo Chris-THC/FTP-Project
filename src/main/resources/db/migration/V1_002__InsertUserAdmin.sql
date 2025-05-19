@@ -1,8 +1,8 @@
 -- Insert an admin user into the database
 
 -- 1. User table is already created
-INSERT INTO personal_info (name, last_name, maternal_last_name, personal_path)
-VALUES ('Alfonso', 'Flores', 'Leal', '/home/admin');
+INSERT INTO personal_info (name, last_name, maternal_last_name, personal_path) VALUES ('Alfonso', 'Flores', 'Leal', '/home/admin');
+
 
 -- 2. Obtener el id_per_info recién insertado (adaptar según SGBD, aquí para MySQL)
 SET @id_per_info := LAST_INSERT_ID();
