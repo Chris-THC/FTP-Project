@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @RestController
@@ -40,12 +41,14 @@ public class FtpController {
                 remotePath = (remotePath == null ? "" : remotePath) + "/" + fileName;
             }
 
-            boolean success = ftpService.uploadFile(file.getInputStream(), remotePath);
-            return success
-                    ? ResponseEntity.ok("Archivo subido exitosamente")
-                    : ResponseEntity.status(400).body("No se pudo subir el archivo");
+            try (InputStream inputStream = file.getInputStream()) {
+                boolean success = ftpService.uploadFile(inputStream, remotePath);
+                return success
+                        ? ResponseEntity.ok("Archivo subido exitosamente")
+                        : ResponseEntity.status(400).body("No se pudo subir el archivo");
+            }
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("Error al subir el archivo");
+            return ResponseEntity.status(500).body("Error al subir el archivo: " + e.getMessage());
         }
     }
 
@@ -104,9 +107,16 @@ public class FtpController {
     public ResponseEntity<byte[]> downloadFile(@RequestBody DownloadFileRequestForm request) {
         try {
             byte[] fileData = ftpService.downloadFile(request.getPath());
-            return ResponseEntity.ok(fileData);
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=\"" + extractFileName(request.getPath()) + "\"")
+                    .body(fileData);
         } catch (IOException e) {
             return ResponseEntity.status(500).body(null);
         }
+    }
+
+    // Método auxiliar para extraer el nombre del archivo de la ruta
+    private String extractFileName(String path) {
+        return path.substring(path.lastIndexOf('/') + 1);
     }
 }
