@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,13 +88,13 @@ public class FtpService {
     }
 
     // Subir archivo al servidor FTP
-    public boolean uploadFile(String localPath, String remotePath) throws IOException {
+    public boolean uploadFile(InputStream inputStream, String remotePath) throws IOException {
         FTPClient ftpClient = loginFtp();
 
-        try (FileInputStream fileInputStream = new FileInputStream(localPath)) {
+        try {
             ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
             ftpClient.enterLocalPassiveMode();
-            return ftpClient.storeFile(remotePath, fileInputStream);
+            return ftpClient.storeFile(remotePath, inputStream);
         } finally {
             logoutFtp(ftpClient);
         }

@@ -6,8 +6,8 @@ import com.ftp.api.service.FtpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -29,17 +29,18 @@ public class FtpController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestBody UploadFileRequestForm request) {
+    public ResponseEntity<String> uploadFile(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "remotePath", required = false) String remotePath
+    ) {
         try {
-            String remotePath = request.getRemotePath();
-
-            // Si remotePath no tiene un archivo especificado, extraemos el nombre del archivo del localPath
+            String fileName = file.getOriginalFilename();
             if (remotePath == null || !remotePath.contains(".")) {
-                String fileName = new File(request.getLocalPath()).getName(); // Obtiene el nombre del archivo del localPath
-                remotePath = remotePath + "/" + fileName; // Construye el remotePath completo con el nombre del archivo
+                // Si remotePath no tiene un nombre de archivo, lo añadimos
+                remotePath = (remotePath == null ? "" : remotePath) + "/" + fileName;
             }
 
-            boolean success = ftpService.uploadFile(request.getLocalPath(), remotePath);
+            boolean success = ftpService.uploadFile(file.getInputStream(), remotePath);
             return success
                     ? ResponseEntity.ok("Archivo subido exitosamente")
                     : ResponseEntity.status(400).body("No se pudo subir el archivo");
