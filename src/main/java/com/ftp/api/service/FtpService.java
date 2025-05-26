@@ -7,9 +7,10 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,13 +88,13 @@ public class FtpService {
     }
 
     // Subir archivo al servidor FTP
-    public boolean uploadFile(String localPath, String remotePath) throws IOException {
+    public boolean uploadFile(InputStream inputStream, String remotePath) throws IOException {
         FTPClient ftpClient = loginFtp();
 
-        try (FileInputStream fileInputStream = new FileInputStream(localPath)) {
-            ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
+        try (InputStream bufferedInputStream = new BufferedInputStream(inputStream)) {
+            ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE); // Asegurar modo binario
             ftpClient.enterLocalPassiveMode();
-            return ftpClient.storeFile(remotePath, fileInputStream);
+            return ftpClient.storeFile(remotePath, bufferedInputStream);
         } finally {
             logoutFtp(ftpClient);
         }
@@ -110,11 +111,13 @@ public class FtpService {
         }
     }
 
-    // Descargar archivo desde el servidor FTP
+   // Descargar archivo desde el servidor FTP
     public byte[] downloadFile(String path) throws IOException {
         FTPClient ftpClient = loginFtp();
 
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE); // Asegurar modo binario
+            ftpClient.enterLocalPassiveMode();
             boolean success = ftpClient.retrieveFile(path, byteArrayOutputStream);
             if (!success) {
                 throw new IOException("Error al descargar el archivo: " + path);
