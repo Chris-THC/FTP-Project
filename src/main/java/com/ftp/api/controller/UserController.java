@@ -3,6 +3,8 @@ package com.ftp.api.controller;
 import com.ftp.api.dto.UserDTO;
 import com.ftp.api.form.PersonalInfoForm;
 import com.ftp.api.form.UserForm;
+import com.ftp.api.form.UserRegistrationForm;
+import com.ftp.api.service.UserRegistrationService;
 import com.ftp.api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +19,8 @@ import java.util.List;
 @RequestMapping(path = "/user")
 @RequiredArgsConstructor
 public class UserController {
-
     private final UserService userService;
+    private final UserRegistrationService userRegistrationService;
 
     @GetMapping(path = "")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
@@ -77,4 +79,19 @@ public class UserController {
         UserDTO userDTO = userService.getUserByNumControl(numControl);
         return ResponseEntity.ok().body(userDTO);
     }
+
+    //    Seccion para el registro de usuarios con directorio FTP
+    @PostMapping("/register")
+    public ResponseEntity<UserDTO> registerUserWithFtpDirectory(
+            @RequestBody UserRegistrationForm registrationForm) {
+        try {
+            UserDTO userDTO = userRegistrationService.registerUserWithFtpDirectory(
+                    registrationForm.getPersonalInfoForm(),
+                    registrationForm.getUserForm());
+            return ResponseEntity.ok(userDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
 }
