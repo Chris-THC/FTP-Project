@@ -18,10 +18,9 @@ public class UserRegistrationService {
 
     public UserDTO registerUserWithFtpDirectory(PersonalInfoForm personalInfoForm, UserForm userForm) throws IOException {
         // Crear el directorio en el servidor FTP
-        String ftpPath = String.format("/home/admin/ftp-data/%s-%s-%s",
+        String ftpPath = String.format("/home/admin/ftp-data/%s-%s",
                 userForm.getControlNumber(),
-                personalInfoForm.getName(),
-                personalInfoForm.getLastName());
+                personalInfoForm.getName());
 
         System.out.println(ftpPath);
 
